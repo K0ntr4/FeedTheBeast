@@ -1,11 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:openfoodfacts/openfoodfacts.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  // Fetch product information
+  OpenFoodAPIConfiguration.userAgent = UserAgent(name: 'FeedTheBeast', url: 'https://github.com/K0ntr4/FeedTheBeast');
+
+  OpenFoodAPIConfiguration.globalLanguages = <OpenFoodFactsLanguage>[
+    OpenFoodFactsLanguage.GERMAN
+  ];
+
+  OpenFoodAPIConfiguration.globalCountry = OpenFoodFactsCountry.GERMANY;
+  ProductQueryConfiguration config = ProductQueryConfiguration(
+    '5449000131805',
+    version: ProductQueryVersion.v3,
+  );
+  ProductResultV3 product = await OpenFoodAPIClient.getProductV3(config);
+
+  // Get product name
+  String productName = product.product?.productName ?? 'Unknown Product';
+  runApp(MyApp(productName: productName));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String productName;
+  const MyApp({super.key, required this.productName});
 
   // This widget is the root of your application.
   @override
@@ -31,7 +49,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: productName),
     );
   }
 }
